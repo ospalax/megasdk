@@ -3274,6 +3274,11 @@ int MegaApi::isNodeSyncable(MegaNode *node)
     return pImpl->isNodeSyncable(node);
 }
 
+void MegaApi::ignoreFilesEnabled(const bool enabled)
+{
+    pImpl->ignoreFilesEnabled(enabled);
+}
+
 void MegaApi::setExcludedNames(vector<string> *excludedNames)
 {
     pImpl->setExcludedNames(excludedNames);
