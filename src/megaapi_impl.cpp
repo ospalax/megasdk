@@ -14666,11 +14666,20 @@ void MegaApiImpl::getua_result(error e)
             MegaStringMap *stringMap = request->getMegaStringMap();
             std::unique_ptr<MegaStringList> keys(stringMap->getKeys());
             const char *key;
+            std::cout << "\n---------------------------------------------------------";
+            std::cout << "\nALIAS DEBUG: getua_result attr does not exists";
             for (int i = 0; i < keys->size(); i++)
             {
                 key = keys->get(i);
                 tlv.set(key, Base64::atob(stringMap->get(key)));
+
+                if (request->getParamType() == MegaApi::USER_ATTR_ALIAS)
+                {
+                    std::string aliasBin = Base64::atob(stringMap->get(key));
+                    std::cout <<"\n [user]: "<< key << "\t[alias]: " << aliasBin;
+                }
             }
+            std::cout << "\n---------------------------------------------------------\n";
 
             // serialize and encrypt the TLV container
             attr_t type = static_cast<attr_t>(request->getParamType());
@@ -14969,6 +14978,16 @@ void MegaApiImpl::getua_result(TLVstore *tlv, attr_t type)
             }
             case MegaApi::USER_ATTR_ALIAS:
             {
+                std::cout << "\n---------------------------------------------------------";
+                std::cout << "\nALIAS DEBUG: getua_result";
+                std::unique_ptr<MegaStringList> keys(stringMap->getKeys());
+                for (int i = 0; i < keys->size(); i++)
+                {
+                    const char *key = keys->get(i);
+                    std::string aliasBin = Base64::atob(stringMap->get(key));
+                    std::cout <<"\n [user]: "<< key << "\t[alias]: " << aliasBin;
+                }
+                std::cout << "\n---------------------------------------------------------\n";
                 // If a uh was set in the request, we have to find it in the aliases map and return it
                 const char *uh = request->getText();
                 if (uh)
@@ -19500,6 +19519,18 @@ void MegaApiImpl::sendPendingRequests()
                 const string_map *newValuesMap = static_cast<MegaStringMapPrivate*>(request->getMegaStringMap())->getMap();
                 if (User::mergeUserAttribute(type, *newValuesMap, *tlv.get()))
                 {
+                    std::cout << "\n---------------------------------------------------------";
+                    std::cout << "\nALIAS DEBUG: sendPendingRequests update attributes";
+                    MegaStringMap * stringMap = request->getMegaStringMap();
+                    std::unique_ptr<MegaStringList> keys(stringMap->getKeys());
+                    for (int i = 0; i < keys->size(); i++)
+                    {
+                        const char *key = keys->get(i);
+                        std::string aliasBin = Base64::atob(stringMap->get(key));
+                        std::cout <<"\n [user]: "<< key << "\t[alias]: " << aliasBin;
+                    }
+                    std::cout << "\n---------------------------------------------------------\n";
+
                     // serialize and encrypt the TLV container
                     std::unique_ptr<string> container(tlv->tlvRecordsToContainer(client->rng, &client->key));
                     client->putua(type, (byte *)container->data(), unsigned(container->size()));
